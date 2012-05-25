@@ -48,9 +48,7 @@
                 }
                 catch(e) {
                     // window.name was something else. pass on our current object.
-                    var obj = {};
-                    obj[this.options.privateKey] = this.storage;
-                    window.name = JSON.encode(obj);
+                    this._serializeWindowName();
                 }
             }
 
@@ -66,6 +64,7 @@
             // add a key to storage hash
             this.storage = JSON.decode(window[this.storageMethod].getItem(this.options.privateKey)) || this.storage;
             this.storage[item] = value;
+
             if (this.hasNativeStorage) {
                 try {
                     window[this.storageMethod].setItem(this.options.privateKey, JSON.encode(this.storage));
@@ -83,8 +82,8 @@
 
         removeItem: function(item) {
             // remove a key from the storage hash
-
             delete this.storage[item];
+
             if (this.hasNativeStorage) {
                 try {
                     window[this.storageMethod].setItem(this.options.privateKey, JSON.encode(this.storage));
@@ -101,7 +100,9 @@
 
         _serializeWindowName: function() {
             // this is the fallback that merges storage into window.name
-            var obj = {}, storage = JSON.decode(window.name);
+            var obj = {},
+                storage = JSON.decode(window.name);
+
             obj[this.options.privateKey] = this.storage;
             window.name = JSON.encode(Object.merge(obj, storage));
         }
