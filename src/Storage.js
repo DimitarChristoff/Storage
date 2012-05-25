@@ -9,8 +9,8 @@
         Implements: [Options],
 
         options: {
-            storageMethod: "sessionStorage", // or localStorage
-            privateKey: "myStorage" // sub key for namespacing
+            storageMethod: 'sessionStorage', // or localStorage
+            privateKey: 'myStorage' // sub key for namespacing
         },
 
         initialize: function(options) {
@@ -26,7 +26,7 @@
             // 3 levels of degradation. with storage, without -> window.name or a simple {}
             var storage;
 
-            this.hasNativeStorage = !(typeof window[this.storageMethod] == "object" && window[this.storageMethod].getItem);
+            this.hasNativeStorage = !(typeof window[this.storageMethod] == 'object' && window[this.storageMethod].getItem);
 
             // try native
             if (this.hasNativeStorage) {
@@ -58,10 +58,12 @@
         },
 
         getItem: function(item) {
+            // return from storage in memory
             return this.storage[item] || null;
         },
 
         setItem: function(item, value) {
+            // add a key to storage hash
             this.storage = JSON.decode(window[this.storageMethod].getItem(this.options.privateKey)) || this.storage;
             this.storage[item] = value;
             if (this.hasNativeStorage) {
@@ -73,15 +75,15 @@
                 }
             }
             else {
-                var obj = {}, storage = JSON.decode(window.name);
-                obj[this.options.privateKey] = this.storage;
-                window.name = JSON.encode(Object.merge(obj, storage));
+                this._serializeWindowName();
             }
 
             return this;
         },
 
         removeItem: function(item) {
+            // remove a key from the storage hash
+
             delete this.storage[item];
             if (this.hasNativeStorage) {
                 try {
@@ -93,10 +95,15 @@
             }
             else {
                 // remove from window.name also.
-                var obj = {}, storage = JSON.decode(window.name);
-                obj[this.options.privateKey] = this.storage;
-                window.name = JSON.encode(Object.merge(obj, storage));
+                this._serializeWindowName();
             }
+        },
+
+        _serializeWindowName: function() {
+            // this is the fallback that merges storage into window.name
+            var obj = {}, storage = JSON.decode(window.name);
+            obj[this.options.privateKey] = this.storage;
+            window.name = JSON.encode(Object.merge(obj, storage));
         }
     });
 
