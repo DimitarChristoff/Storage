@@ -26,7 +26,7 @@
             // 3 levels of degradation. with storage, without -> window.name or a simple {}
             var storage;
 
-            this.hasNativeStorage = !(typeof window[this.storageMethod] == 'object' && window[this.storageMethod].getItem);
+            this.hasNativeStorage = !!(typeof window[this.storageMethod] == 'object' && window[this.storageMethod].getItem);
 
             // try native
             if (this.hasNativeStorage) {
